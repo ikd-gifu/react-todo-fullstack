@@ -34,8 +34,9 @@ services:
       TZ: ${TZ}
     # ホスト上のディレクトリをコンテナでマウントする
     # ローカル環境の作業ディレクトリをコンテナと共有する
+    # DockerfileのWORKDIRで指定した場所にマウントされる
     volumes:
-      - ./backend:/app
+      - ./backend:/rails
     ports:
       - "${BACKEND_PORT}:${BACKEND_CONTAINER_PORT}"
     # 起動順の依存関係を指定

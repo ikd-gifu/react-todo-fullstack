@@ -12,6 +12,8 @@
 ARG RUBY_VERSION=3.4.5
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
+# このイメージ内での作業場所を固定
+# 生成ファイルは /rails に作られる
 # Rails app lives here
 WORKDIR /rails
 
