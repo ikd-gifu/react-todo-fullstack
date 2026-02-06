@@ -1,15 +1,18 @@
 services:
   db:
+    # Dockerのイメージストア（Docker Desktopの内部VM）に保存されているMySQLのイメージを使用
     image: mysql:8.0
     env_file: .env
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       TZ: ${TZ}
+    # ホスト側のポートとコンテナ内のポートを紐づけ
     ports:
       - "${MYSQL_PORT}:${MYSQL_CONTAINER_PORT}"
     volumes:
       - db-data:/var/lib/mysql
+    # healthy になると depends_on の条件を満たす
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 5s
@@ -17,8 +20,10 @@ services:
       retries: 10
 
   backend:
+    # ./backendにてDockerfileをビルドしてイメージを作成
     build:
       context: ./backend
+    # コンテナ起動時に実行するコマンド
     command: bash -lc "bin/rails s -b 0.0.0.0 -p ${BACKEND_CONTAINER_PORT}"
     env_file: .env
     environment:
@@ -27,10 +32,14 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       RAILS_ENV: ${RAILS_ENV}
       TZ: ${TZ}
+    # ホスト上のディレクトリをコンテナでマウントする
+    # ローカル環境の作業ディレクトリをコンテナと共有する
     volumes:
       - ./backend:/app
     ports:
       - "${BACKEND_PORT}:${BACKEND_CONTAINER_PORT}"
+    # 起動順の依存関係を指定
+    # 依存先のヘルスチェックが「healthy」になってから起動
     depends_on:
       db:
         condition: service_healthy
