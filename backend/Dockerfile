@@ -77,6 +77,7 @@ RUN groupadd --system --gid 1000 rails && \
 USER 1000:1000
 
 # build ステージから bundle とアプリをコピーして、実行に必要なものだけを持つ軽量な最終イメージを作成
+# /railsにアプリ一式を置く
 # Copy built artifacts: gems, application
 COPY --chown=rails:rails --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --chown=rails:rails --from=build /rails /rails

@@ -1,5 +1,8 @@
 # README
 
+コマンドで生成
+rails new backend --api -d mysql
+
 This README would normally document whatever steps are necessary to get the
 application up and running.
 

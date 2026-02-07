@@ -36,6 +36,7 @@ services:
     # ローカル環境の作業ディレクトリをコンテナと共有する
     # DockerfileのWORKDIRで指定した場所にマウントされる
     volumes:
+      # ホストの backend をコンテナ内の /rails に見せる
       - ./backend:/rails
     ports:
       - "${BACKEND_PORT}:${BACKEND_CONTAINER_PORT}"
