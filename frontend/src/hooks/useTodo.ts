@@ -1,5 +1,6 @@
-import { useState, useCallback } from "react";
-import { INITIAL_TODOS, INITIAL_UNIQUE_ID } from "../constants/data";
+import { useState, useCallback, useEffect } from "react";
+import axios from "axios";
+import { TodoType } from "../types/Todo";
 
 /**
  * Todoのグローバル状態管理とCRUD操作
@@ -9,10 +10,29 @@ import { INITIAL_TODOS, INITIAL_UNIQUE_ID } from "../constants/data";
 export const useTodo = () => {
   // todo listの状態管理
   // const [現在の値, 値を更新するための関数] = useState(初期値);
-  const [originalTodoList, setOriginalTodoList] = useState(INITIAL_TODOS );
+  const [originalTodoList, setOriginalTodoList] = useState<Array<TodoType>>([]);
   // 重複しない ID を生成
   // const [uniqueId, setUniqueId] = useState(INITIAL_TODOS.length + 1); データはdata.jsで一元管理
-  const [uniqueId, setUniqueId] = useState(INITIAL_UNIQUE_ID);
+  const [uniqueId, setUniqueId] = useState(0);
+
+  // useEffectを副作用（API呼び出し）の再実行を防ぐためにuseCallbackでラップ
+  const fetchTodos = useCallback(async () => {
+    try {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL;
+      const response = await axios.get<Array<TodoType>>(`${baseUrl}/todos`);
+
+      setOriginalTodoList(response.data);
+
+      const maxId = response.data.reduce((max, todo) => Math.max(max, todo.id), 0);
+      setUniqueId(maxId);
+    } catch (error) {
+      console.error("Failed to fetch todos:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTodos(); // 関数を実行する エラーはIDの採番をバックエンドに移行することで解消
+  }, [fetchTodos]); // 「関数そのもの（参照）」を渡している。関数を監視
 
   /**
    * Todo新規作成処理（フォームからの登録用）
