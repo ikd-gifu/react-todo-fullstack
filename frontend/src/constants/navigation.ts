@@ -1,7 +1,7 @@
 // ベースURL
 // Web公開することを想定しサブパス定義
 // as constは冗長なので省略
-export const BASE_URL = '/typescript-migration';
+export const BASE_URL = '/react-todo-fullstack';
 
 // ルート定義用（:id などのプレースホルダーを含む）
 // React Routerの<Route path={...}>で使用

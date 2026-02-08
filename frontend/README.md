@@ -1,11 +1,15 @@
-# 02-typescript-migration
+# react-todo-fullstack frontend
 
-**JavaScript → TypeScript移行版** Todoアプリケーション
+**react-todo-fullstack のフロントエンド** Todoアプリケーション
 
 ## 概要
 
-`01-javascript-router`をTypeScript化したプロジェクトです。
-React Router v7 + Context API + TypeScriptによる型安全な実装を実現しています。
+React Router v7 + Context API + TypeScriptによる型安全な実装で、
+APIと連携するフロントエンドです。
+
+## バックエンド
+
+APIは別フォルダのバックエンドで提供します。詳細は `../backend/README.md` を参照してください。
 
 ## 使用技術
 
@@ -24,7 +28,7 @@ React Router v7 + Context API + TypeScriptによる型安全な実装を実現�
 - **Template専用フック**: ビジネスロジック分離
 - **React Router v7**: ページ遷移・ルーティング
 
-詳細は `/docs` フォルダ内のドキュメントを参照してください。
+詳細は `./docs` フォルダ内のドキュメントを参照してください。
 
 ## セットアップ
 
@@ -39,6 +43,8 @@ npm install
 ```bash
 npm run dev
 ```
+
+バックエンドも別途起動してください。
 
 ### ビルド
 
@@ -95,9 +101,3 @@ src/
 - Todo詳細表示
 - 検索機能（前方一致）
 
-## 01-javascript-routerとの違い
-
-- TypeScript化による型安全性の向上
-- `.jsx` → `.tsx` ファイル拡張子変更
-- `types/` フォルダ追加（型定義の一元管理）
-- Props、State、関数の型定義追加
