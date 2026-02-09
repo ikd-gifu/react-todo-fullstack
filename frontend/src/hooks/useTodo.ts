@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
-import axios from "axios";
 import { TodoType } from "../types/Todo";
+import { getTodos } from "../apis/todoCrud";
 
 /**
  * Todoのグローバル状態管理とCRUD操作
@@ -18,12 +18,11 @@ export const useTodo = () => {
   // useEffectを副作用（API呼び出し）の再実行を防ぐためにuseCallbackでラップ
   const fetchTodos = useCallback(async () => {
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL;
-      const response = await axios.get<Array<TodoType>>(`${baseUrl}/todos`);
+      const data = await getTodos();
 
-      setOriginalTodoList(response.data);
+      setOriginalTodoList(data);
 
-      const maxId = response.data.reduce((max, todo) => Math.max(max, todo.id), 0);
+      const maxId = data.reduce((max, todo) => Math.max(max, todo.id), 0);
       setUniqueId(maxId);
     } catch (error) {
       console.error("Failed to fetch todos:", error);
