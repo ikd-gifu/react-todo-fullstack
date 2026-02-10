@@ -6,4 +6,6 @@ export type TodoType = {
   // content?: stringにすると、今度は読み取り側（詳細/編集/表示など）で
   // contentがundefinedになる可能性が増えてしまうため、ここでは必須にする
   content: string;
+  createdAt: string;
+  updatedAt: string;
 }

@@ -7,7 +7,9 @@ const baseUrl = import.meta.env.VITE_API_BASE_URL;
 // 設定済みクライアント」を作る部分
 const apiClient = axios.create({
   baseURL: baseUrl,
-  // JSON形式のデータをやり取りする設定 Content-Type を自動で付ける
+  headers: {
+  "Content-Type": "application/json",
+  },
 });
 
 export default apiClient;

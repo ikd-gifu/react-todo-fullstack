@@ -18,11 +18,15 @@ export const useTodo = () => {
   // useEffectを副作用（API呼び出し）の再実行を防ぐためにuseCallbackでラップ
   const fetchTodos = useCallback(async () => {
     try {
-      const data = await getTodos();
+      const res = await getTodos();
+      if (!res.data) {
+        console.error(res.message || "No data received");
+        return;
+      }
 
-      setOriginalTodoList(data);
+      setOriginalTodoList(res.data);
 
-      const maxId = data.reduce((max, todo) => Math.max(max, todo.id), 0);
+      const maxId = res.data.reduce((max, todo) => Math.max(max, todo.id), 0);
       setUniqueId(maxId);
     } catch (error) {
       console.error("Failed to fetch todos:", error);
