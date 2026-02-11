@@ -1,4 +1,4 @@
-// データ構造（DTO/Model）なのでtypeで定義
+// データ構造（DTO/Model）なのでtypeで定義 データの実体の型
 // グローバルに影響を与えないようにexport付きで定義
 export type TodoType = {
   id: number;

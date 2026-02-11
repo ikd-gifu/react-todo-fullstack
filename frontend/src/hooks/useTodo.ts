@@ -1,6 +1,5 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { TodoType } from "../types/Todo";
-import { getTodos } from "../apis/todoCrud";
 
 /**
  * Todoのグローバル状態管理とCRUD操作
@@ -14,28 +13,6 @@ export const useTodo = () => {
   // 重複しない ID を生成
   // const [uniqueId, setUniqueId] = useState(INITIAL_TODOS.length + 1); データはdata.jsで一元管理
   const [uniqueId, setUniqueId] = useState(0);
-
-  // useEffectを副作用（API呼び出し）の再実行を防ぐためにuseCallbackでラップ
-  const fetchTodos = useCallback(async () => {
-    try {
-      const res = await getTodos();
-      if (!res.data) {
-        console.error(res.message || "No data received");
-        return;
-      }
-
-      setOriginalTodoList(res.data);
-
-      const maxId = res.data.reduce((max, todo) => Math.max(max, todo.id), 0);
-      setUniqueId(maxId);
-    } catch (error) {
-      console.error("Failed to fetch todos:", error);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchTodos(); // 関数を実行する エラーはIDの採番をバックエンドに移行することで解消
-  }, [fetchTodos]); // 「関数そのもの（参照）」を渡している。関数を監視
 
   /**
    * Todo新規作成処理（フォームからの登録用）

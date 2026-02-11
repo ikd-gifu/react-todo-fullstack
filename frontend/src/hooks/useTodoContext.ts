@@ -5,11 +5,11 @@ import { TodoContext } from "../contexts/TodoContext";
 // export const useTodoContext = () =>  useContext(TodoContext);
 export const useTodoContext = () => {
   const context = useContext(TodoContext);
-  
+
   if (context === undefined) {
     throw new Error('useTodoContext must be used within TodoProvider');
   }
-  
+
   // undefinedでないので型はTodoContextValueTypeとして推論される
   return context;
 };
