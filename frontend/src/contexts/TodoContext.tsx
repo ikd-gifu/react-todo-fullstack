@@ -5,7 +5,6 @@ import { TodoType } from "../types/Todo";
 type TodoContextValueType = {
   originalTodoList: Array<TodoType>;
   // 関数の型シグネチャ 引数を受け取るが、戻り値は使わない
-  handleCreateTodo: (title: string, content: string) => void;
   handleDeleteTodo: (targetId: number, targetTitle: string) => void;
   handleUpdateTodo: (targetId: number, title: string, content: string) => void;
 };
@@ -36,7 +35,6 @@ export const TodoProvider: FC<TodoProviderProps> = ({ children }) => {
   // リファクタリング後: CRUD操作のみを提供
   const {
     originalTodoList, // データソース
-    handleCreateTodo, // 新規作成関数
     handleDeleteTodo, // 削除関数
     handleUpdateTodo, // 更新関数
   } = useTodo();
@@ -47,7 +45,6 @@ export const TodoProvider: FC<TodoProviderProps> = ({ children }) => {
     <TodoContext.Provider
       value={{
         originalTodoList, // データソース
-        handleCreateTodo, // 新規作成関数
         handleDeleteTodo, // 削除関数
         handleUpdateTodo, // 更新関数
       }}>

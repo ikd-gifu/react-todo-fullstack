@@ -10,34 +10,6 @@ export const useTodo = () => {
   // todo listの状態管理
   // const [現在の値, 値を更新するための関数] = useState(初期値);
   const [originalTodoList, setOriginalTodoList] = useState<Array<TodoType>>([]);
-  // 重複しない ID を生成
-  // const [uniqueId, setUniqueId] = useState(INITIAL_TODOS.length + 1); データはdata.jsで一元管理
-  const [uniqueId, setUniqueId] = useState(0);
-
-  /**
-   * Todo新規作成処理（フォームからの登録用）
-   * @param {string} title - Todoのタイトル
-   * @param {string} content - Todoの内容
-   */
-  const handleCreateTodo = useCallback(
-    // default値はuseTodoCreateTemplateのuseFormで設定
-    (title: string, content?: string) => {
-      const nextId = uniqueId + 1;
-      
-      const newTodoList = [
-        ...originalTodoList,
-        {
-          id: nextId,
-          title,
-          // undefinedを空文字に変換して、常にstringを入力
-          // TodoTypeの型契約に合わせる（contentは必須でstring型）
-          content: content ?? "",
-        },
-      ];
-    
-    setOriginalTodoList(newTodoList);
-    setUniqueId(nextId);
-  }, [uniqueId, originalTodoList]);
 
   // Todo削除処理 @param は /**  */ のJSDocコメント内で使う
   /**
@@ -52,7 +24,7 @@ export const useTodo = () => {
         const newTodoList = originalTodoList.filter((todo) => todo.id !== targetId);
         
         // 状態を更新
-        setOriginalTodoList(newTodoList);
+        setOriginalTodoList(newTodoList); // backendに移行予定
       }
     }, [originalTodoList]);
 
@@ -69,12 +41,11 @@ export const useTodo = () => {
           ? { ...todo, title, content }
           : todo
       );
-      setOriginalTodoList(newTodoList);
+      setOriginalTodoList(newTodoList); // backendに移行予定
     }, [originalTodoList]);
 
   return {
     originalTodoList, // データソース
-    handleCreateTodo, // 新規作成処理（フォームから登録用）
     handleDeleteTodo, // 削除処理
     handleUpdateTodo, // 更新処理
   };

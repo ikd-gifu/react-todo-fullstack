@@ -1,10 +1,10 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
-import { useTodoContext } from '../../../hooks/useTodoContext';
 import { NAV_ITEMS } from '../../../constants/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { createTodo } from '../../../apis/todoCrud';
 
 // オブジェクトスキーマを定義
 const TodoCreateFormSchema = z.object({
@@ -31,7 +31,6 @@ type TodoCreateFormValues = z.infer<typeof TodoCreateFormSchema>;
  */
 export const useTodoCreateTemplate = () => {
   const navigate = useNavigate();
-  const { handleCreateTodo } = useTodoContext();
 
   const {
     control, // コンポーネントを登録するためのメソッドを含む
@@ -49,12 +48,14 @@ export const useTodoCreateTemplate = () => {
   // フォーム送信とTodoの実際の作成処理を分離
   const handleCreateSubmit = handleSubmit(
     useCallback(
-      (values: TodoCreateFormValues) => {
-        // undefinedを空文字に変換して渡すTodoCreateFormValuesの型契約に合わせる
-        handleCreateTodo(values.title, values.content ?? "");
-        navigate(NAV_ITEMS.TOP);
+      async (values: TodoCreateFormValues) => {
+          await createTodo({
+            title: values.title,
+            content: values.content,
+          });
+        navigate(NAV_ITEMS.TOP); // 登録後にトップページへ遷移
       },
-      [handleCreateTodo, navigate]
+      [navigate]
     )
   );
 
