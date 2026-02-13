@@ -15,6 +15,27 @@ module Api
         end
       end
 
+      def show
+        todo = Todo.find(params[:id])
+        render json: serialize_todo(todo)
+      end
+
+      def update
+        todo = Todo.find(params[:id])
+        if todo.update(todo_params)
+          render json: serialize_todo(todo)
+        else
+          render json: { errors: todo.errors.full_messages }, status: :unprocessable_entity
+        end
+      end
+
+      def destroy
+        todo = Todo.find(params[:id])
+        todo.destroy
+        # 204 No Content は 成功したがレスポンスボディは空であることを示す
+        head :no_content
+      end
+
       private
 
       # レスポンスをcamelCase 変換

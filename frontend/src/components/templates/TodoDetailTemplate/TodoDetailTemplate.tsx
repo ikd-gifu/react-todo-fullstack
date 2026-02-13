@@ -1,5 +1,4 @@
-import { useParams } from 'react-router';
-import { useTodoContext } from '../../../hooks/useTodoContext';
+import { useTodoDetailTemplate } from './useTodoDetailTemplate';
 import { InputForm, CommonTextArea } from '../../atoms';
 import { BasicLayout } from '../../organisms';
 import styles from './style.module.css';
@@ -9,12 +8,7 @@ import styles from './style.module.css';
  * URLパラメータから取得したTodoの詳細情報を表示（読み取り専用）
  */
 export const TodoDetailTemplate = () => {
-  const { id } = useParams();
-  const { originalTodoList } = useTodoContext();
-
-  // URLパラメータのidに一致するTodoを取得
-  // 計算コストが低いのでuseMemoは不要
-  const todo = originalTodoList.find((todo) => todo.id === Number(id));
+  const { todo } = useTodoDetailTemplate();
 
   if (!todo) {
     return (

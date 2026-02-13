@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect, useCallback } from "react";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
-import { getTodos } from "../../../apis/todoCrud";
+import { getTodos, deleteTodo } from "../../../apis/todoCrud";
 import { TodoType } from "../../../types/Todo";
 
 // defaultValuesで""を使うため、string型で定義 optionalは不要
@@ -35,17 +35,10 @@ export const useTodoTemplate = () => {
 
       setOriginalTodoList(res.data);
 
-      // バックエンドに移行予定
-      // const maxId = res.data.reduce((max, todo) => Math.max(max, todo.id), 0);
-      // setUniqueId(maxId);
     } catch (error) {
       console.error("Failed to fetch todos:", error);
     }
   }, []);
-
-  useEffect(() => {
-    fetchTodos(); // 関数を実行する エラーはIDの採番をバックエンドに移行することで解消
-  }, [fetchTodos]); // 「関数そのもの（参照）」を渡している。関数を監視
 
   const {
     control,
@@ -59,16 +52,25 @@ export const useTodoTemplate = () => {
   const searchInputValue = useWatch({ control, name: "search" }) ?? "";
 
   const handleDeleteTodo = useCallback(
-  (targetId: number, targetTitle: string) => {
+    async (targetId: number, targetTitle: string) => {
     // 確認ダイアログを表示
-    if (window.confirm(`「${targetTitle}」を削除しますか？`)) {
-      // 削除対象のID以外のTodoだけを残す
-      const newTodoList = originalTodoList.filter((todo) => todo.id !== targetId);
-      
-      // 状態を更新
-      setOriginalTodoList(newTodoList);
+    if (!window.confirm(`「${targetTitle}」を削除しますか？`)) {
+      return;
     }
-  }, [originalTodoList]);
+
+    const res = await deleteTodo({ id: targetId });
+    // 204 No Contentも成功とみなす res.dataはundefined
+    const isSuccess = res.code === 204 || Boolean(res.data);
+    if (!isSuccess) {
+      console.error(res.message || "Failed to delete todo");
+      return;
+    }
+
+    // バックエンドで削除が成功した場合にフロントエンドの状態からも削除
+    setOriginalTodoList((prev) => prev.filter((todo) => todo.id !== targetId));
+  },
+  [setOriginalTodoList] // ESLintの警告回避のために依存配列にset関数を追加
+);
 
   // 検索キーワードに基づいて表示するTodoリストを絞り込む
   // useMemoで派生状態を最適化
@@ -79,6 +81,10 @@ export const useTodoTemplate = () => {
     );
     // originalTodoListかsearchInputValueが変化したときに再計算
   }, [originalTodoList, searchInputValue]);
+
+  useEffect(() => {
+    fetchTodos(); // fetchTodos() が await getTodos() を挟むので非同期処理
+  }, [fetchTodos]);
 
   return {
     control,

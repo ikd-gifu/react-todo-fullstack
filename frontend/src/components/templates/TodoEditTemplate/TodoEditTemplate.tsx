@@ -12,18 +12,19 @@ import styles from './style.module.css';
 export const TodoEditTemplate = () => {
   // カスタムフックでTodoデータ、フォーム状態、更新処理を取得
   const {
-    todo,
     control,
     errors,
     handleEditSubmit,
   } = useTodoEditTemplate();
 
+  const rootErrorMessage = errors.root?.message;
+
   // Todoが存在しない場合の表示
-  if (!todo) {
+  if (rootErrorMessage) {
     return (
       <BasicLayout title="Todo編集">
         <div className={styles.notFound}>
-          <p>指定されたTodoが見つかりませんでした</p>
+          <p>{rootErrorMessage}</p>
         </div>
       </BasicLayout>
     );

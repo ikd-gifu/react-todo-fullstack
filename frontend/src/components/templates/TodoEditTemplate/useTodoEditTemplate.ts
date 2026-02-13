@@ -1,10 +1,10 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { useTodoContext } from '../../../hooks/useTodoContext';
 import { NAV_ITEMS } from '../../../constants/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { getTodoById, updateTodo } from '../../../apis/todoCrud';
 
 // オブジェクトスキーマを定義
 const TodoEditFormSchema = z.object({
@@ -33,24 +33,42 @@ type TodoEditFormSchema = z.infer<typeof TodoEditFormSchema>;
 export const useTodoEditTemplate = () => {
   const { id } = useParams(); // URLからidパラメータを取得
   const navigate = useNavigate();
-  const { originalTodoList, handleUpdateTodo } = useTodoContext();
-
-  // URLパラメータのidに一致するTodoを取得
-  const todo = originalTodoList.find((todo) => todo.id === Number(id));
 
   const {
     control,
     handleSubmit,
     formState: { errors },
+    setValue,
+    setError,
+    clearErrors,
   } = useForm<TodoEditFormSchema>({ // フォーム全体の状態管理と操作APIを提供するフック
     resolver: zodResolver(TodoEditFormSchema),
-    // todo 未取得時でも string を保証するために ?? "" 
-    // を使用することで、非制御→制御コンポーネントの警告を防ぐ
     defaultValues: {
-      title: todo?.title ?? "",
-      content: todo?.content ?? "",
+      title: "",
+      content: "",
     }
   });
+
+  const fetchTodo = useCallback(async () => {
+    const todoId = Number(id);
+    if (!id || Number.isNaN(todoId)) {
+      setError("root", { message: "指定されたTodoが見つかりませんでした" });
+      return;
+    }
+
+    const res = await getTodoById({ id: todoId });
+    if (!res.data) {
+      setError("root", { message: "指定されたTodoが見つかりませんでした" });
+      return;
+    }
+
+    setValue("title", res.data.title ?? "");
+    setValue("content", res.data.content ?? "");
+  }, [id, setValue, setError, clearErrors]);
+
+  useEffect(() => {
+    fetchTodo();
+  }, [fetchTodo]);
 
   /**
    * Todo更新処理
@@ -58,18 +76,30 @@ export const useTodoEditTemplate = () => {
   // <form>を使わないのでe: FormEventなど不要
   const handleEditSubmit = handleSubmit(
     useCallback(
-      (values: TodoEditFormSchema) => {
-        if (todo && values.title !== '') {
-          handleUpdateTodo(todo.id, values.title, values.content ?? "");
-          navigate(NAV_ITEMS.TOP);
+      async (values: TodoEditFormSchema) => {
+        const todoId = Number(id);
+        if (!id || Number.isNaN(todoId)) {
+          setError("root", { message: "指定されたTodoが見つかりませんでした" });
+          return;
         }
+
+        const res = await updateTodo({
+          id: todoId,
+          title: values.title,
+          content: values.content ?? "",
+        });
+
+        if (!res.data) {
+          setError("root", { message: res.message || "更新に失敗しました" });
+          return;
+        }
+          navigate(NAV_ITEMS.TOP);
         },
-        [todo, handleUpdateTodo, navigate]
+        [id, navigate, setError]
       )
   );
 
   return {
-    todo,
     control,
     errors,
     handleEditSubmit,

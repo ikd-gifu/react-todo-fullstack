@@ -1,5 +1,5 @@
 import apiClient from "./apiClient";
-import { TodoType } from "../types/Todo";
+import { TodoType, CreateTodoRequest, GetTodoRequest, UpdateTodoRequest, DeleteTodoRequest } from "../types/Todo";
 import { TodoResponseType, AxiosErrorResponseType } from "../types/TodoResponse";
 import { isAxiosError } from "axios";
 
@@ -26,15 +26,66 @@ export const getTodos = async () => {
   }
 };
 
-export const createTodo = async (payload: {title: string, content?: string}) => {
+export const createTodo = async (payload: CreateTodoRequest) => {
+  // 引数にオブジェクト(payload)を渡すので、payloadの型をオブジェクト型のCreateTodoRequestに指定
   try {
     // レスポンスはArray<TodoType>ではなくTodoType単体
-    const response = await apiClient.post<TodoType>('/todos', payload);
+    const response = await apiClient.post<TodoType>('/todos', payload); // payloadオブジェクトをわたす
     const res: TodoResponseType<TodoType> = { code: response.status, data: response.data };
     return res;
   } catch (error) {
     const res: TodoResponseType = { code: 500, message: "Unexpected error" };
         if (isAxiosError(error)) { // Axios由来 → response や statusが存在する可能性あり
+      const axiosError = error as AxiosErrorResponseType;
+      res.code = axiosError.response?.status ?? 500;
+      res.message = axiosError.response?.data?.errors?.[0]?.detail ?? "Request failed";
+    }
+    return res;
+  }
+};
+
+export const getTodoById = async (payload: GetTodoRequest) => {
+  try {
+    // レスポンスはArray<TodoType>ではなくTodoType単体
+    const response = await apiClient.get<TodoType>(`/todos/${payload.id}`);
+    const res: TodoResponseType<TodoType> = { code: response.status, data: response.data };
+    return res;
+  } catch (error) {
+    const res: TodoResponseType = { code: 500, message: "Unexpected error" };
+        if (isAxiosError(error)) { // Axios由来 → response や statusが存在する可能性あり
+      const axiosError = error as AxiosErrorResponseType;
+      res.code = axiosError.response?.status ?? 500;
+      res.message = axiosError.response?.data?.errors?.[0]?.detail ?? "Request failed";
+    }
+    return res;
+  }
+};
+
+export const updateTodo = async (payload: UpdateTodoRequest) => {
+  try {
+      const { id, ...body } = payload; // idをURLに使い、残り(title, content)をbodyに展開
+      const response = await apiClient.put<TodoType>(`/todos/${id}`, body);
+      const res: TodoResponseType<TodoType> = { code: response.status, data: response.data };
+      return res;
+  } catch (error) {
+        const res: TodoResponseType = { code: 500, message: "Unexpected error" };
+    if (isAxiosError(error)) {
+      const axiosError = error as AxiosErrorResponseType;
+      res.code = axiosError.response?.status ?? 500;
+      res.message = axiosError.response?.data?.errors?.[0]?.detail ?? "Request failed";
+    }
+    return res;
+  }
+};
+
+export const deleteTodo = async (payload: DeleteTodoRequest) => {
+  try {
+    const response = await apiClient.delete<TodoType>(`/todos/${payload.id}`);
+    const res: TodoResponseType<TodoType> = { code: response.status, data: response.data };
+    return res;
+  } catch (error) {
+    const res: TodoResponseType = { code: 500, message: "Unexpected error" };
+    if (isAxiosError(error)) {
       const axiosError = error as AxiosErrorResponseType;
       res.code = axiosError.response?.status ?? 500;
       res.message = axiosError.response?.data?.errors?.[0]?.detail ?? "Request failed";

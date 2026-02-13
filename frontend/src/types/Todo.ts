@@ -9,3 +9,22 @@ export type TodoType = {
   createdAt: string;
   updatedAt: string;
 }
+
+export type CreateTodoRequest = {
+  title: string;
+  content?: string;
+};
+
+export type GetTodoRequest = {
+  id: number;
+};
+
+export type UpdateTodoRequest = {
+  id: number;
+  title: string;
+  content?: string;
+};
+
+export type DeleteTodoRequest = {
+  id: number;
+};

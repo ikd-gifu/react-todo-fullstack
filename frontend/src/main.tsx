@@ -1,7 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client' // React 18 以降の新しいレンダリング方法
 import Router from './router/Router'
-import { TodoProvider } from './contexts/TodoContext'
 import './index.css'
 
 // main.jsxはアプリケーションのエントリーポイントとして機能
@@ -12,8 +11,6 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     {/* すべてのルート（ページ）で状態を共有するためにTodoProviderでラップ */}
     {/* ページ遷移してもデータが保持される */}
-    <TodoProvider>
-      <Router />
-    </TodoProvider>
+    <Router />
   </StrictMode>,
 )
